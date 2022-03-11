@@ -1,7 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-
+const userRouter = require("./routers/userRouter");
+const instructorRouter = require("./routers/instructorRouter");
+const courseRouter = require("./routers/courseRouter");
 
 const app = express();
 
@@ -12,5 +14,9 @@ if (process.env.ENV === "development") {
 }
 
 app.use(express.json());
+
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/instructors", instructorRouter);
+app.use("/api/v1/courses", courseRouter);
 
 module.exports = app;
