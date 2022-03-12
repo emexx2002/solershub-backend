@@ -5,6 +5,9 @@ const userRouter = require("./routers/userRouter");
 const instructorRouter = require("./routers/instructorRouter");
 const courseRouter = require("./routers/courseRouter");
 const globalErrorHandler = require("./controllers/errorController");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: "./config.env" });
 
 const app = express();
 
