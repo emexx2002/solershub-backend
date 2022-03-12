@@ -10,11 +10,13 @@ class Email{
     } 
     sendWelcome(subject, url) {
         sgMail.setApiKey(this.API_KEY)
-        to = this.mailto
-        from = this.mailfrom
-        subject = "Welcome!"
-        text = 'Congratulations on creating an account with SolersHub. \
-        Please, confirm your mail here.'
+        const msg = {
+            to : this.mailto,
+            from : this.mailfrom,
+            subject : "Welcome!",
+            html : 'Congratulations on creating an account with SolersHub. \
+            Please, confirm your mail here.',
+        }
         sgMail
             .send(msg)
             .then(() => {
@@ -26,10 +28,12 @@ class Email{
     }
     sendPasswordReset(url, time) {
         sgMail.setApiKey(this.API_KEY)
-        to = this.mailtofrom
-        from = this.mailfrom
-        subject = "Password reset link"
-        html = "Here's the link to reset your password."
+        const msg = {
+            to : this.mailtofrom,
+            from : this.mailfrom,
+            subject : "Password reset link",
+            html : "Here's the link to reset your password.",
+        }
         sgMail        
             .send(msg)
             .then(() => {
