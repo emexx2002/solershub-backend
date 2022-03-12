@@ -21,7 +21,7 @@ exports.getAll = (Model, user, removeDisabled, options) =>
         success (res, '200', newUser, true)
     })
 
-exports.deleteOne = (Model, newUser) => 
+exports.deleteUser = (Model, newUser) => 
     catchAsync(async (req, res, next) => {
         user = await Model.FindbyId(req.params.id)
 
@@ -30,7 +30,7 @@ exports.deleteOne = (Model, newUser) =>
         }
 
         if (req.user.id == user.user || req.user.role == 'admin') {
-            doc.deleteOne()
+            doc.deleteUser()
             return success (res, '204', user)
         } else {
             return next(
