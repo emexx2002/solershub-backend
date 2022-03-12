@@ -32,5 +32,11 @@ exports.deleteOne = (Model, newUser) =>
         if (req.user.id == user.user || req.user.role == 'admin') {
             doc.deleteOne()
             return success (res, '204', user)
+        } else {
+            return next(
+                new AppError(
+                    "Unable to delete this user account as you are not the owner of this user account", 401
+                )
+            )
         }
     })
