@@ -15,13 +15,14 @@ class Email{
         subject = "Welcome!"
         text = 'Congratulations on creating an account with SolersHub. \
         Please, confirm your mail here.'
-        .send(msg)
-        .then(() => {
-            console.log('Email sent')
-        })
-        .catch((error) => {
-            console.error(error)
-        })
+        sgMail
+            .send(msg)
+            .then(() => {
+                console.log('Email sent')
+            })
+            .catch((error) => {
+                console.error(error)
+            })
     }
     sendPasswordReset(url, time) {
         sgMail.setApiKey(this.API_KEY)
