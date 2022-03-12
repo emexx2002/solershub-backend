@@ -109,6 +109,52 @@ exports.instructorSignUp = catchAsync(async (req, res, next) => {
   createSendToken(newInstructor, 201, res);
 });
 
+exports.loginAsInstructor = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(
+      new AppError("Please provide email and password for this user", 400)
+    );
+  }
+
+  let instructor = await Instructor.findOne({ email });
+
+  if (!instructor || !(await bcrypt.compare(password, instructor.password))) {
+    return next(new AppError("Incorrect email or password!", 401));
+  }
+
+  const passwordChangeDate = Date.now();
+  await Instructor.findByIdAndUpdate(instructor.id, {
+    passwordChangeDate,
+  });
+
+  createSendToken(instructor, 200, res);
+});
+
+exports.loginAsUser = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(
+      new AppError("Please provide email and password for this user", 400)
+    );
+  }
+
+  let user = await User.findOne({ email });
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return next(new AppError("Incorrect email or password!", 401));
+  }
+
+  const passwordChangeDate = Date.now();
+  await User.findByIdAndUpdate(user.id, {
+    passwordChangeDate,
+  });
+
+  createSendToken(user, 200, res);
+});
+
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
   if (
@@ -118,7 +164,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   } else {
     return next(
-      new AppError("You are not logged in, please log in to gain access!", 401)
+      new AppError("You are not logged in, please log in to gain access!", 404)
     );
   }
 
