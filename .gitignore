@@ -1,6 +1,3 @@
 *.env
 node_modules/
-<<<<<<< HEAD
 sendgrid.env
-=======
->>>>>>> 05d46612d86880921a644b7ead37210edb5a0c4b
