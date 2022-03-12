@@ -1,7 +1,6 @@
 // courseRouter.js - courses route model
 const express = require('express')
 const router = express.Router()
-const Course = require('../models/courseModel')
 
 //Course page route
 router.post('/addnewcourse', (res, req) => {
