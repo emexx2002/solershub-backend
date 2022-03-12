@@ -7,10 +7,12 @@ router.post("/signup", authController.userSignUp);
 router.post("/login", authController.loginAsUser);
 router.post("/password/forgot", authController.sendResetURLUser);
 router.get("/password/reset/:id/:token", authController.resetPasswordUser);
-router.get("/confirm/:id/:token", authController.confirmUser)
+router.get("/confirm/:id/:token", authController.confirmUser);
+router.get("/email/reset/:id/:token", authController.confirmUser);
 
 router.use(authController.protectUser);
 
 router.patch("/password/update", authController.updatePasswordUser);
+router.patch("/email/update", authController.updateEmailUser);
 
 module.exports = router;

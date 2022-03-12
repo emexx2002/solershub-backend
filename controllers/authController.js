@@ -90,9 +90,9 @@ exports.userSignUp = catchAsync(async (req, res, next) => {
   newUser.password = undefined;
   const emailSender = new Email(SENDGRID_API_KEY, newUser.email);
   const verifyToken = crypto.randomBytes(15).toString("hex");
-  await User.findByIdAndUpdate(newUser.id, { verifyToken });
+  await User.findByIdAndUpdate(newUser.id, { verifyHash: verifyToken });
   await emailSender.sendWelcome(
-    `${CONFIRM_URL}instructors/confirm/${newUser.id}/${verifyToken}`
+    `${CONFIRM_URL}users/confirm/${newUser.id}/${verifyToken}`
   );
 
   createSendToken(newUser, 201, res);
@@ -137,7 +137,7 @@ exports.instructorSignUp = catchAsync(async (req, res, next) => {
 
   const emailSender = new Email(SENDGRID_API_KEY, newInstructor.email);
   const verifyToken = crypto.randomBytes(15).toString("hex");
-  await User.findByIdAndUpdate(newInstructor.id, { verifyToken });
+  await User.findByIdAndUpdate(newInstructor.id, { verifyHash: verifyToken });
   await emailSender.sendWelcome(
     `${CONFIRM_URL}instructors/confirm/${newInstructor.id}/${verifyToken}`
   );
@@ -454,6 +454,7 @@ exports.confirmUser = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(user.id, {
     verified: true,
   });
+  user.verified = true;
   createSendToken(user, 200, res);
 });
 
@@ -470,5 +471,52 @@ exports.confirmInstructor = catchAsync(async (req, res, next) => {
   await Instructor.findByIdAndUpdate(instructor.id, {
     verified: true,
   });
-  createSendToken(updatedInstructor, 200, res);
+  instructor.verified = true;
+  createSendToken(instructor, 200, res);
+});
+
+exports.updateEmailUser = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  const verifyHash = crypto.randomBytes(15).toString("hex");
+
+  const emailSender = new Email(SENDGRID_API_KEY, email);
+
+  await emailSender.sendMailReset(
+    `${TOKEN_RESET_URL}users/email/reset/${req.user.id}/${verifyHash}`
+  );
+
+  const user = await User.findByIdAndUpdate(req.user.id, {
+    email,
+    verified: false,
+    verifyHash,
+  });
+
+  res.status(201).json({
+    status: "success",
+    message: "Please activate new email address",
+  });
+});
+
+exports.updateEmailInstructor = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  const verifyHash = crypto.randomBytes(15).toString("hex");
+
+  const emailSender = new Email(SENDGRID_API_KEY, email);
+
+  await emailSender.sendMailReset(
+    `${TOKEN_RESET_URL}instructors/email/reset/${req.instructor.id}/${verifyHash}`
+  );
+
+  const instructor = await Instructor.findByIdAndUpdate(req.instructor.id, {
+    email,
+    verified: false,
+    verifyHash,
+  });
+
+  res.status(201).json({
+    status: "success",
+    message: "Please activate new email address",
+  });
 });

@@ -12,9 +12,11 @@ router.get(
   authController.resetPasswordInstructor
 );
 router.get("/confirm/:id/:token", authController.confirmInstructor);
+router.get("/email/reset/:id/:token", authController.confirmInstructor);
 
 router.use(authController.protectInstructor);
 
 router.patch("/password/update", authController.updatePasswordInstructor);
+router.patch("/email/update", authController.updateEmailInstructor)
 
 module.exports = router;
