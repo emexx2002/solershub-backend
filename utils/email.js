@@ -30,13 +30,14 @@ class Email{
         from = this.mailfrom
         subject = "Password reset link"
         html = "Here's the link to reset your password."
-                .send(msg)
-        .then(() => {
-            console.log('Email sent')
-        })
-        .catch((error) => {
-            console.error(error)
-        })
+        sgMail        
+            .send(msg)
+            .then(() => {
+                console.log('Email sent')
+            })
+            .catch((error) => {
+                console.error(error)
+            })
     }
 }
 
