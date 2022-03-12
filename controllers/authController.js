@@ -108,3 +108,37 @@ exports.instructorSignUp = catchAsync(async (req, res, next) => {
 
   createSendToken(newInstructor, 201, res);
 });
+
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else {
+    return next(
+      new AppError("You are not logged in, please log in to gain access!", 401)
+    );
+  }
+
+  const decoded = await decodeJWT(token);
+  const id = decoded.id;
+
+  let user, instructor, participant;
+  user = await User.findById(id);
+  instructor = await Instructor.findById(id);
+
+  if (!user && !instructor) {
+    return next(new AppError("No user found!", 401));
+  }
+
+  if (user && !instructor) {
+    participant = user;
+  } else if (!user && instructor) {
+    participant = instructor;
+  }
+
+  req.participant = participant;
+  next();
+});
