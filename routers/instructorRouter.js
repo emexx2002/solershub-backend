@@ -1,9 +1,13 @@
 // courseRouter.js - courses route model
 const express = require("express");
 const authController = require("../controllers/authController");
+const instructorController = require("../controllers/instructorController");
 
 const router = express.Router();
 
+router.get("/", instructorController.getAllInstructors);
+router.get("/:id", instructorController.getOneInstructor);
+router.delete("/:id", instructorController.deleteOneInstructor);
 router.post("/signup", authController.instructorSignUp);
 router.post("/login", authController.loginAsInstructor);
 router.post("/password/forgot", authController.sendResetURLInstructor);
@@ -16,7 +20,8 @@ router.get("/email/reset/:id/:token", authController.confirmInstructor);
 
 router.use(authController.protectInstructor);
 
-router.patch("/password/update", authController.updatePasswordInstructor);
-router.patch("/email/update", authController.updateEmailInstructor)
+router.patch("/me/password/update", authController.updatePasswordInstructor);
+router.patch("/me/email/update", authController.updateEmailInstructor);
+router.delete("/me/delete", instructorController.deleteMe);
 
 module.exports = router;

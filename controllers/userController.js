@@ -1,31 +1,31 @@
-const User = require('../models/userModel')
-const authController = require('../controllers/authController')
-const AppError = require('../utils/appError') 
+const User = require("../models/userModel");
+const factoryController = require("./factoryController");
+const AppError = require("../utils/appError");
+const catchAsync = require('../utils/catchAsync')
 
-let users
+let users, user;
 
 // Controller function to get all users
-exports.getAllUsers = common.getAll(User, users, true)
+exports.getAllUsers = factoryController.getAll(User, users, false, "users");
 
 // Controller function to get single user
-const getUser = ((req, res) => {
-    const id = Number(req.params.userID)
-    const user = Users.find(user => user.id === id)
+exports.getOneUser = factoryController.getOne(User, user, "user");
 
-    if (!user) {
-        return res.status(404).send('User not found')
-    }
-    res.json(user)
-})
+// Controller function to delete a user
+exports.deleteOneUser = factoryController.deleteOne(User, 'user');
 
-// Controller function to update user data
-const updateUser = ((req, res) => {
-    const id = Number(req.params.userID)
-    const index = users.findIndex(user => user.id === id)
-    const updateUser = {
-        name: req.body.name,
-        image: req.body.image
-    }
-})
+// Controller function to delete a user
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  const { id } = req.user;
+  user = await User.findById(id);
 
-// Controller function to delete user data
+  if (!user) {
+    return next(new AppError("No user found with that identifier", 404));
+  }
+
+  await User.findByIdAndDelete(id);
+
+  res.status(204).json({
+    data: null,
+  });
+});
