@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const emailVal = require("email-validator");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -9,6 +10,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Every user must have an email address!"],
     unique: [true, "Email already in use by another user!"],
+    validate: {
+      validator: emailVal.validate,
+    },
   },
   password: {
     type: String,
@@ -24,12 +28,13 @@ const userSchema = new mongoose.Schema({
   },
   verified: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   verifyHash: String,
   passwordResetExpires: Date,
+  passwordChangeDate: Date,
 });
 
-const User = mongoose.model('User', userSchema)
+const User = mongoose.model("User", userSchema);
 
-module.exports = User
+module.exports = User;
