@@ -151,13 +151,13 @@ exports.uploadImage = (Model, type) =>
         image: `public/images/${type}s/${filename}`,
       });
 
-    //   await sharp(`${req.file.destination}/${req.file.filename}`)
-    //     .resize(500, 500)
-    //     .toFormat("jpeg")
-    //     .jpeg({
-    //       quality: 90,
-    //     })
-    //     .toFile(`public/images/${type}s/2${filename}`);
+      //   await sharp(`${req.file.destination}/${req.file.filename}`)
+      //     .resize(500, 500)
+      //     .toFormat("jpeg")
+      //     .jpeg({
+      //       quality: 90,
+      //     })
+      //     .toFile(`public/images/${type}s/2${filename}`);
 
       res.status(201).json({
         status: "success",
@@ -165,3 +165,5 @@ exports.uploadImage = (Model, type) =>
       });
     });
   });
+
+

@@ -31,3 +31,21 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 });
 
 exports.uploadImage = factoryController.uploadImage(User, "user");
+
+exports.updateOneUser = catchAsync(async (req, res, next) => {
+  const { name } = req.body;
+  const user = req.user;
+
+  if (!name) {
+    return next(new AppError("No name to update found!", 400));
+  }
+
+  await User.findByIdAndUpdate(user.id, {
+    name,
+  });
+
+  res.status(201).json({
+    status: "success",
+    message: "User successfully updated!",
+  });
+});

@@ -25,7 +25,7 @@ exports.deleteOneInstructor = factoryController.deleteOne(
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   const { id } = req.instructor;
-  console.log(id);
+  // console.log(id);
   instructor = await Instructor.findById(id);
 
   if (!instructor) {
@@ -40,3 +40,34 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 });
 
 exports.uploadImage = factoryController.uploadImage(Instructor, "instructor");
+
+exports.updateOneInstructor = catchAsync(async (req, res, next) => {
+  const { name, description } = req.body;
+  instructor = req.instructor;
+  if (name && !description) {
+    await Instructor.findByIdAndUpdate(instructor.id, {
+      name,
+    });
+  } else if (!name && description) {
+    await Instructor.findByIdAndUpdate(instructor.id, {
+      description,
+    });
+  } else if (name && description) {
+    await Instructor.findByIdAndUpdate(instructor.id, {
+      name,
+      description,
+    });
+  } else if (!name && !description) {
+    return next(
+      new AppError(
+        "Please pass name or description to be updated or both!",
+        400
+      )
+    );
+  }
+
+  res.status(201).json({
+    status: "success",
+    message: "Instructor successfully updated",
+  });
+});

@@ -24,5 +24,6 @@ router.patch("/me/password/update", authController.updatePasswordInstructor);
 router.patch("/me/email/update", authController.updateEmailInstructor);
 router.delete("/me/delete", instructorController.deleteMe);
 router.patch("/me/image/upload", instructorController.uploadImage);
+router.patch("/me/basic/update", instructorController.updateOneInstructor);
 
 module.exports = router;
