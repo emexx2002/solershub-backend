@@ -12,13 +12,20 @@ exports.getAllInstructors = factoryController.getAll(
   "instructors"
 );
 
-exports.getOneInstructor = factoryController.getOne(Instructor, instructor, "instructor");
+exports.getOneInstructor = factoryController.getOne(
+  Instructor,
+  instructor,
+  "instructor"
+);
 
-exports.deleteOneInstructor = factoryController.deleteOne(Instructor, 'instructor');
+exports.deleteOneInstructor = factoryController.deleteOne(
+  Instructor,
+  "instructor"
+);
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
-    const { id } = req.instructor;
-    console.log(id)
+  const { id } = req.instructor;
+  console.log(id);
   instructor = await Instructor.findById(id);
 
   if (!instructor) {
@@ -31,3 +38,5 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.uploadImage = factoryController.uploadImage(Instructor, "instructor");

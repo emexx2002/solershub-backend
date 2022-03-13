@@ -1,7 +1,7 @@
 const User = require("../models/userModel");
 const factoryController = require("./factoryController");
 const AppError = require("../utils/appError");
-const catchAsync = require('../utils/catchAsync')
+const catchAsync = require("../utils/catchAsync");
 
 let users, user;
 
@@ -12,7 +12,7 @@ exports.getAllUsers = factoryController.getAll(User, users, false, "users");
 exports.getOneUser = factoryController.getOne(User, user, "user");
 
 // Controller function to delete a user
-exports.deleteOneUser = factoryController.deleteOne(User, 'user');
+exports.deleteOneUser = factoryController.deleteOne(User, "user");
 
 // Controller function to delete a user
 exports.deleteMe = catchAsync(async (req, res, next) => {
@@ -29,3 +29,5 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.uploadImage = factoryController.uploadImage(User, "user");
