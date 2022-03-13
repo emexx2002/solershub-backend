@@ -24,7 +24,7 @@ exports.getAll = (Model, doc, course, name) =>
     const skip = (page - 1) * limit;
     if (course) {
       doc = await Model.find({ published: true, status: "active" })
-        .skip(offset)
+        .skip(skip)
         .limit(limit);
     } else {
       doc = await Model.find().skip(skip).limit(limit);

@@ -133,7 +133,7 @@ exports.getAllCourses = factoryController.getAll(
 exports.searchCourses = catchAsync(async (req, res, next) => {
   const { q } = req.query;
 
-  courses = await Course.find({ published: true, status: "active" })
+  courses = await Course.find({ published: true, status: "active" });
 
   selectedCourses = [];
   courses.map((course) => {
@@ -142,10 +142,30 @@ exports.searchCourses = catchAsync(async (req, res, next) => {
     }
   });
 
-
   res.status(200).json({
     status: "success",
     results: selectedCourses.length,
     data: { selectedCourses },
   });
 });
+
+exports.courseMiddleware = catchAsync(async (req, res, next) => {
+  const courseId = req.params.courseId;
+  const course = await Course.findById(courseId);
+  console.log(courseId);
+
+  if (!course) {
+    return next(new AppError("No course found with that identifier", 404));
+  }
+
+  if (!(req.instructor.id === course.owner)) {
+    return next(
+      new AppError("You are not authorized to perform this action!", 401)
+    );
+  }
+
+  req.course = course;
+  next();
+});
+
+exports.addCourseBackground = factoryController.uploadImage(Course, "course");

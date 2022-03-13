@@ -29,5 +29,7 @@ router.patch("/me/basic/update", instructorController.updateOneInstructor);
 router.post("/courses/create", courseController.createCourse);
 router.patch("/courses/publish/:courseId", courseController.publishCourse);
 router.patch("/courses/update/:courseId", courseController.updateCourseBasic);
+router.patch("/courses/:courseId/image/upload", courseController.courseMiddleware, courseController.addCourseBackground);
+
 
 module.exports = router;
