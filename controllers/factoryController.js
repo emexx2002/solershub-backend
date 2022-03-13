@@ -39,7 +39,6 @@ exports.getAll = (Model, doc, course, name) =>
       instructors = doc;
       res.status(200).json({
         status: "success",
-        results: instructors.length,
         paging: {
           total: count,
           page: currentPage,
@@ -51,10 +50,9 @@ exports.getAll = (Model, doc, course, name) =>
       users = doc;
       res.status(200).json({
         status: "success",
-        results: users.length,
         paging: {
           total: count,
-          page: totalPages,
+          page: currentPage,
           pages: totalPages,
         },
         data: { users },
@@ -63,10 +61,9 @@ exports.getAll = (Model, doc, course, name) =>
       courses = doc;
       res.status(200).json({
         status: "success",
-        results: courses.length,
         paging: {
           total: count,
-          page: totalPages,
+          page: currentPage,
           pages: totalPages,
         },
         data: { courses },
@@ -165,5 +162,3 @@ exports.uploadImage = (Model, type) =>
       });
     });
   });
-
-
