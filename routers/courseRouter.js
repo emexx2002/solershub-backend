@@ -1,20 +1,10 @@
 // courseRouter.js - courses route model
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const courseController = require("../controllers/courseController");
+const router = express.Router();
 
-//Course page route
-router.post('/addnewcourse', (res, req) => {
-    res.send("New course(s) added.")
-})
+router.get("/single/:id", courseController.getOneCourse);
+router.get("/", courseController.getAllCourses);
+router.get("/search", courseController.searchCourses);
 
-//Add new courses
-exports.courseinstance_create_get = function (req, res) {
-    res.send('New course added!')
-}
-
-//Delete courses
-exports.courseinstance_delete_get = function (req, res) {
-    res.send('Course deleted!')
-}
-
-module.exports = router
+module.exports = router;

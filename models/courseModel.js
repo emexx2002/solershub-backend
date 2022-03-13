@@ -4,6 +4,7 @@ const courseSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Every user must have a name!"],
+    unique: [true, "There is already a course woth this name!"],
   },
   image: {
     type: String,
@@ -13,7 +14,7 @@ const courseSchema = new mongoose.Schema({
     required: [true, "Every course must have an owner!"],
   },
   sections: [{ type: Object }],
-  rating: Number,
+  rating: { type: Number, default: 0 },
   reviews: [{ type: Object }],
   description: {
     type: String,
@@ -29,9 +30,18 @@ const courseSchema = new mongoose.Schema({
       required: [true, "Every course must have at least one category!"],
     },
   ],
-  enrolled: Number,
-  published: Boolean,
-  status: String,
+  enrolled: {
+    type: Number,
+    default: 0,
+  },
+  published: {
+    type: Boolean,
+    default: false,
+  },
+  status: {
+    type: String,
+    default: "inactive",
+  },
 });
 
 const Course = new mongoose.model("Course", courseSchema);

@@ -12,6 +12,7 @@ dotenv.config({ path: "./config.env" });
 const app = express();
 
 app.use(cors());
+app.use(express.static("public"));
 
 if (process.env.ENV === "development") {
   app.use(morgan("dev"));

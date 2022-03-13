@@ -18,6 +18,8 @@ router.use(authController.protectUser);
 
 router.patch("/me/password/update", authController.updatePasswordUser);
 router.patch("/me/email/update", authController.updateEmailUser);
-router.delete("/me/delete", userController.deleteMe)
+router.delete("/me/delete", userController.deleteMe);
+router.patch("/me/image/upload", userController.uploadImage);
+router.patch("/me/basic/update", userController.updateOneUser);
 
 module.exports = router;
