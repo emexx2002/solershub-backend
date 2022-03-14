@@ -59,5 +59,10 @@ router.patch(
   courseController.courseMiddleware,
   courseController.addSubsectionText
 );
+router.delete(
+  "/courses/:courseId/section/asset/remove/:sectionId",
+  courseController.courseMiddleware,
+  courseController.deleteOneAsset
+);
 
 module.exports = router;

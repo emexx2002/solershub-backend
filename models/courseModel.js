@@ -15,8 +15,8 @@ const courseSchema = new mongoose.Schema({
     required: [true, "Every course must have an owner!"],
   },
   sections: [{ type: Schema.Types.ObjectId, ref: "Section" }],
-  rating: { type: Number, default: 0 },
-  reviews: [{ type: Object }],
+  ratingsAverage: { type: Number, default: 0 },
+  reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
   description: {
     type: String,
     required: [true, "Every course must have a description!"],
@@ -31,9 +31,14 @@ const courseSchema = new mongoose.Schema({
       required: [true, "Every course must have at least one category!"],
     },
   ],
-  enrolled: {
+  enrolledAmount: {
     type: Number,
     default: 0,
+  },
+  enrolledUsers: [{ type: Object }],
+  summary: {
+    type: String,
+    required: [true, "Every course must have a summary"],
   },
   published: {
     type: Boolean,
@@ -46,7 +51,7 @@ const courseSchema = new mongoose.Schema({
 });
 
 courseSchema.pre(/^find/, function (next) {
-  this.populate("sections");
+  this.populate("sections").populate("reviews");
   next();
 });
 

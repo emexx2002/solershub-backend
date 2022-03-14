@@ -55,18 +55,29 @@ const decodeJWT = async (token) => {
 };
 
 exports.userSignUp = catchAsync(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, referredBy, birthday } = req.body;
+  let referrer;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !birthday) {
     return next(
-      new AppError("Please pass name, email and password in request body", 400)
+      new AppError(
+        "Please pass name, email, password and birthday in request body",
+        400
+      )
     );
   }
+
+  const paymentOptions = {
+    paid: false,
+    access: false,
+  };
 
   const user = {
     name,
     email,
     password,
+    birthday,
+    paymentOptions,
   };
 
   const users = await User.find();
@@ -82,10 +93,23 @@ exports.userSignUp = catchAsync(async (req, res, next) => {
     return next(new AppError("There is another user with this email", 400));
   }
 
+  if (referredBy) {
+    referrer = await User.findOne({ ref: referredBy });
+    if (!referrer) {
+      return next(new AppError("No user found with that reference code", 400));
+    }
+
+    user.referredBy = referrer.id;
+  }
+
   user.password = await hashPassword(10, user.password);
   user.passwordChangeDate = Date.now();
 
   const newUser = await User.create(user);
+  if (referredBy) {
+    referrer.referred.push(newUser.id);
+    await User.findByIdAndUpdate(referrer.id, referrer);
+  }
 
   newUser.password = undefined;
   const emailSender = new Email(SENDGRID_API_KEY, newUser.email);
@@ -94,6 +118,10 @@ exports.userSignUp = catchAsync(async (req, res, next) => {
   await emailSender.sendWelcome(
     `${CONFIRM_URL}users/confirm/${newUser.id}/${verifyToken}`
   );
+
+  if (referredBy) {
+    await emailSender.sendReferralMessageSignUp(referrer.email, newUser);
+  }
 
   createSendToken(newUser, 201, res);
 });
