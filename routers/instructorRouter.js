@@ -29,7 +29,35 @@ router.patch("/me/basic/update", instructorController.updateOneInstructor);
 router.post("/courses/create", courseController.createCourse);
 router.patch("/courses/publish/:courseId", courseController.publishCourse);
 router.patch("/courses/update/:courseId", courseController.updateCourseBasic);
-router.patch("/courses/:courseId/image/upload", courseController.courseMiddleware, courseController.addCourseBackground);
-
+router.patch(
+  "/courses/:courseId/image/upload",
+  courseController.courseMiddleware,
+  courseController.addCourseBackground
+);
+router.patch(
+  "/courses/:courseId/section/add",
+  courseController.courseMiddleware,
+  courseController.addCourseSection
+);
+router.delete(
+  "/courses/:courseId/section/remove/:sectionId",
+  courseController.courseMiddleware,
+  courseController.deleteCourseSection
+);
+router.patch(
+  "/courses/:courseId/section/update/:sectionId",
+  courseController.courseMiddleware,
+  courseController.updateCourseSection
+);
+router.patch(
+  "/courses/:courseId/section/video/add/:sectionId",
+  courseController.courseMiddleware,
+  courseController.addSubsectionVideo
+);
+router.patch(
+  "/courses/:courseId/section/text/add/:sectionId",
+  courseController.courseMiddleware,
+  courseController.addSubsectionText
+);
 
 module.exports = router;

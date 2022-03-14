@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Schema } = require("mongoose");
 
 const courseSchema = new mongoose.Schema({
   name: {
@@ -13,7 +14,7 @@ const courseSchema = new mongoose.Schema({
     type: String,
     required: [true, "Every course must have an owner!"],
   },
-  sections: [{ type: Object }],
+  sections: [{ type: Schema.Types.ObjectId, ref: "Section" }],
   rating: { type: Number, default: 0 },
   reviews: [{ type: Object }],
   description: {
@@ -42,6 +43,11 @@ const courseSchema = new mongoose.Schema({
     type: String,
     default: "inactive",
   },
+});
+
+courseSchema.pre(/^find/, function (next) {
+  this.populate("sections");
+  next();
 });
 
 const Course = new mongoose.model("Course", courseSchema);

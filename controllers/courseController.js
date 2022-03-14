@@ -2,6 +2,7 @@ const Course = require("../models/courseModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const factoryController = require("./factoryController");
+const Section = require("../models/sectionModel");
 
 let course, courses;
 
@@ -152,7 +153,6 @@ exports.searchCourses = catchAsync(async (req, res, next) => {
 exports.courseMiddleware = catchAsync(async (req, res, next) => {
   const courseId = req.params.courseId;
   const course = await Course.findById(courseId);
-  console.log(courseId);
 
   if (!course) {
     return next(new AppError("No course found with that identifier", 404));
@@ -169,3 +169,279 @@ exports.courseMiddleware = catchAsync(async (req, res, next) => {
 });
 
 exports.addCourseBackground = factoryController.uploadImage(Course, "course");
+
+exports.addCourseSection = catchAsync(async (req, res, next) => {
+  const { name, index } = req.body;
+
+  const course = req.course;
+
+  if (!name) {
+    return next(
+      new AppError("Please pass the name attribute in the request body", 400)
+    );
+  }
+
+  const sectionCheck = await Section.findOne({ name });
+  if (sectionCheck) {
+    return next(
+      new AppError("There is already a section with this name!", 400)
+    );
+  }
+
+  let ind;
+  if (index == undefined) {
+    ind = course.sections.length;
+  } else {
+    ind = index;
+  }
+
+  if (ind < 0 || ind > course.sections.length) {
+    return next(
+      new AppError(
+        "Index cannot be negative or higher than the number of sections in course",
+        400
+      )
+    );
+  }
+
+  const sectionsForCourse = await Section.find({
+    ownerCourse: course.id,
+    index: { $gte: ind },
+  });
+
+  await Promise.all(
+    sectionsForCourse.map(async (section) => {
+        newInd = section.index + 1;
+        section.index = newInd;
+        await Section.findByIdAndUpdate(section, section);
+    })
+  );
+
+  const section = await Section.create({
+    name,
+    index: ind,
+    ownerCourse: course.id,
+  });
+
+  course.sections.push(section.id);
+
+  await Course.findByIdAndUpdate(course.id, course);
+  const updatedCourse = await Course.findById(course.id);
+
+  res.status(201).json({
+    status: "success",
+    message: "Successfully created new course section",
+    data: { course: updatedCourse },
+  });
+});
+
+exports.deleteCourseSection = catchAsync(async (req, res, next) => {
+  const { sectionId } = req.params;
+  const course = req.course;
+
+  const section = await Section.findById(sectionId);
+
+  if (!section) {
+    return next(new AppError("No section found with that identifier!", 404));
+  }
+
+  await Section.findByIdAndDelete(sectionId);
+  const sections = await Section.find({
+    ownerCourse: course.id,
+    index: { $gte: section.index },
+  });
+  await Promise.all(
+    sections.map(async (sec) => {
+      newInd = sec.index - 1;
+      sec.index = newInd;
+      await Section.findByIdAndUpdate(sec.id, sec);
+    })
+  );
+
+  res.status(204).json({
+    status: "success",
+    message: "Course section deleted successfully",
+    data: { course },
+  });
+});
+
+exports.updateCourseSection = catchAsync(async (req, res, next) => {
+  const { name } = req.body;
+  const { sectionId } = req.params;
+
+  const course = req.course;
+
+  if (!name) {
+    return next(new AppError("No data to update found", 400));
+  }
+
+  const section = await Section.findById(sectionId);
+  if (!section) {
+    return next(new AppError("No section found with that identifier!", 404));
+  }
+
+  section.name = name;
+  await Section.findByIdAndUpdate(sectionId, section);
+
+  const updatedCourse = await Course.findById(course.id);
+
+  res.status(201).json({
+    status: "success",
+    message: "Course section updated successfully",
+    data: { course: updatedCourse },
+  });
+});
+
+exports.addSubsectionVideo = catchAsync(async (req, res, next) => {
+  const { sectionId } = req.params;
+  const { videoText, videoTitle, videoURL, index } = req.body;
+  const course = req.course;
+
+  const section = await Section.findById(sectionId);
+  if (!section) {
+    return next(new AppError("No section found with that identifier!", 404));
+  }
+
+  let ind;
+  if (index == undefined) {
+    ind = section.sub.length;
+    console.log("NO INDEX FOUND");
+  } else {
+    ind = index;
+    console.log("INDEX FOUND");
+  }
+  // console.log(ind);
+
+  if (ind < 0 || ind > section.sub.length) {
+    return next(
+      new AppError(
+        "Index cannot be negative or higher than the number of assets in section",
+        400
+      )
+    );
+  }
+  // console.log(ind);
+
+  const asset = {
+    type: "video",
+    videoText,
+    videoTitle,
+    videoURL,
+    index: ind,
+    date: Date.now(),
+  };
+  // console.log(ind);
+
+  for (i = 0; i < section.sub.length; i++) {
+    if (section.sub[i].index >= ind) {
+      newInd = section.sub[i].index + 1;
+      section.sub[i].index = newInd;
+    }
+  }
+
+  section.sub.push(asset);
+  section.sub.sort((a, b) => a.index - b.index);
+  await Section.findByIdAndUpdate(section.id, section);
+
+  const updatedCourse = await Course.findById(course.id);
+  return res.status(201).json({
+    status: "success",
+    message: "Section Video Successfully Added",
+    data: { course: updatedCourse },
+  });
+});
+
+exports.addSubsectionText = catchAsync(async (req, res, next) => {
+  const { sectionId } = req.params;
+  const { text, textTitle, index } = req.body;
+  const course = req.course;
+
+  const section = await Section.findById(sectionId);
+  if (!section) {
+    return next(new AppError("No section found with that identifier!", 404));
+  }
+
+  let ind;
+  if (index == undefined) {
+    ind = section.sub.length;
+    console.log("NO INDEX FOUND");
+  } else {
+    ind = index;
+    console.log("INDEX FOUND");
+  }
+  // console.log(ind);
+
+  if (ind < 0 || ind > section.sub.length) {
+    return next(
+      new AppError(
+        "Index cannot be negative or higher than the number of assets in section",
+        400
+      )
+    );
+  }
+  // console.log(ind);
+
+  const asset = {
+    type: "text",
+    text,
+    textTitle,
+    index: ind,
+    date: Date.now(),
+  };
+  // console.log(ind);
+
+  for (i = 0; i < section.sub.length; i++) {
+    if (section.sub[i].index >= ind) {
+      newInd = section.sub[i].index + 1;
+      section.sub[i].index = newInd;
+    }
+  }
+
+  section.sub.push(asset);
+  section.sub.sort((a, b) => a.index - b.index);
+  await Section.findByIdAndUpdate(section.id, section);
+
+  const updatedCourse = await Course.findById(course.id);
+  return res.status(201).json({
+    status: "success",
+    message: "Section Text Successfully Added",
+    data: { course: updatedCourse },
+  });
+})
+// exports.rateCourse = catchAsync(async (req, res, next) => {
+//   const user = req.user;
+//   const { courseId } = req.params;
+//   const { rating, review } = req.body;
+
+//   const course = await Course.findById(courseId);
+//   if (!course) {
+//     return next(new AppError("No course found with that identifier", 404));
+//   }
+
+//   let choice;
+//   const choiceArr = [];
+
+//   user.courses.map((userCourse) => {
+//     if (userCourse.id === course.id) {
+//       choiceArr.push(true);
+//     } else {
+//       choiceArr.push(false);
+//     }
+//   });
+
+//   if (choiceArr.includes(true)) {
+//     choice = true;
+//   } else {
+//     choice = false;
+//   }
+
+//   if (choice === true) {
+//     return next(
+//       new AppError(
+//         "You do not have the permission to rate the course as you have not enrolled",
+//         401
+//       )
+//     );
+//   }
+
+// });
