@@ -22,10 +22,10 @@ router.patch("/me/email/update", authController.updateEmailUser);
 router.delete("/me/delete", userController.deleteMe);
 router.patch("/me/image/upload", userController.uploadImage);
 router.patch("/me/basic/update", userController.updateOneUser);
-router.get(
-  "/checkout-session",
-  courseController.courseMiddleware,
-  courseController.getCheckoutSession
-);
+// router.get(
+//   "/checkout-session",
+//   courseController.courseMiddleware,
+//   courseController.getCheckoutSession
+// );
 
 module.exports = router;

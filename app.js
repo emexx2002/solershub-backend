@@ -6,6 +6,7 @@ const instructorRouter = require("./routers/instructorRouter");
 const courseRouter = require("./routers/courseRouter");
 const globalErrorHandler = require("./controllers/errorController");
 const dotenv = require("dotenv");
+const messageRouter = require("./routers/messageRouter");
 
 dotenv.config({ path: "./config.env" });
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/instructors", instructorRouter);
 app.use("/api/v1/courses", courseRouter);
+app.use("/api/v1/messaging", messageRouter);
 
 app.use(globalErrorHandler);
 

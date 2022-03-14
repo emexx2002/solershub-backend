@@ -7,7 +7,7 @@ function makeid() {
   var characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   var charactersLength = characters.length;
-  for (var i = 0; i < 6; i++) {
+  for (var i = 0; i < 9; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
@@ -30,9 +30,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Every user must have a password!"],
   },
-  birthday: [
-    { type: Date, required: [true, "Every user must have a birthday!"] },
-  ],
+  birthday: {
+    type: Date,
+    required: [true, "Every user must have a birthday!"],
+  },
   ref: { type: String, default: makeid },
   referred: [{ type: Schema.Types.ObjectId, ref: "User" }],
   referredBy: {
@@ -51,6 +52,11 @@ const userSchema = new mongoose.Schema({
   verifyHash: String,
   passwordResetExpires: Date,
   passwordChangeDate: Date,
+});
+
+userSchema.pre(/^find/, function (next) {
+  this.populate("referred");
+  next();
 });
 
 const User = mongoose.model("User", userSchema);
