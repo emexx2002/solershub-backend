@@ -55,6 +55,22 @@ class Email {
       console.log("AN ERROR OCCURED WHILE SENDING MAIL", err.response);
     }
   }
+
+  async sendReferralMessageSignUp(referrerEmail, referred) {
+    try {
+      sgMail.setApiKey(this.API_KEY)
+      const msg = {
+        to: referrerEmail,
+        from: this.mailfrom,
+        subject: "Welcome!",
+        text: `${referred.name} has just signed up using your referal code`,
+      };
+      await sgMail.send(msg);
+      console.log("EMAIL SENT SUCCESSFULLY");
+    } catch (err) {
+      console.log("AN ERROR OCCURED WHILE SENDING MAIL", err.response);
+    }
+  }
 }
 
 module.exports = Email;

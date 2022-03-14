@@ -1,6 +1,7 @@
 const express = require("express");
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
+const courseController = require("../controllers/courseController");
 
 const router = express.Router();
 
@@ -21,5 +22,10 @@ router.patch("/me/email/update", authController.updateEmailUser);
 router.delete("/me/delete", userController.deleteMe);
 router.patch("/me/image/upload", userController.uploadImage);
 router.patch("/me/basic/update", userController.updateOneUser);
+router.get(
+  "/checkout-session",
+  courseController.courseMiddleware,
+  courseController.getCheckoutSession
+);
 
 module.exports = router;

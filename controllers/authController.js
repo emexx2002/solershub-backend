@@ -55,7 +55,8 @@ const decodeJWT = async (token) => {
 };
 
 exports.userSignUp = catchAsync(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, referredBy } = req.body;
+  let referrer;
 
   if (!name || !email || !password) {
     return next(

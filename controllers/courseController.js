@@ -3,12 +3,13 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const factoryController = require("./factoryController");
 const Section = require("../models/sectionModel");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 let course, courses;
 
 exports.createCourse = catchAsync(async (req, res, next) => {
   instructor = req.instructor;
-  const { name, description, price, categories } = req.body;
+  const { name, description, price, categories, summary } = req.body;
 
   if (!name || !description || !price || !categories) {
     return next(
@@ -33,6 +34,7 @@ exports.createCourse = catchAsync(async (req, res, next) => {
     price,
     owner: instructor.id,
     categories: categoriesSplit,
+    summary
   };
 
   const newCourse = await Course.create(parameters);
@@ -211,9 +213,9 @@ exports.addCourseSection = catchAsync(async (req, res, next) => {
 
   await Promise.all(
     sectionsForCourse.map(async (section) => {
-        newInd = section.index + 1;
-        section.index = newInd;
-        await Section.findByIdAndUpdate(section, section);
+      newInd = section.index + 1;
+      section.index = newInd;
+      await Section.findByIdAndUpdate(section, section);
     })
   );
 
@@ -407,7 +409,86 @@ exports.addSubsectionText = catchAsync(async (req, res, next) => {
     message: "Section Text Successfully Added",
     data: { course: updatedCourse },
   });
-})
+});
+
+exports.deleteOneAsset = catchAsync(async (req, res, next) => {
+  const { sectionId } = req.params;
+  const index = req.body.index;
+
+  if (index == undefined) {
+    return next(
+      new AppError(
+        "Please provide the indexof the asset to be deleted in the request body",
+        400
+      )
+    );
+  }
+
+  const section = await Section.findById(sectionId);
+  if (!section) {
+    return next(new AppError("No section found with that identifier!", 404));
+  }
+
+  course = req.course;
+  const decisionArr = [];
+  const newAssets = [];
+
+  section.sub.map((asset) => {
+    if (asset.index === index) {
+      decisionArr.push(true);
+    } else if (!(asset.index === index)) {
+      decisionArr.push(false);
+      newAssets.push(asset);
+    }
+  });
+
+  console.log(newAssets);
+
+  if (!decisionArr.includes(true)) {
+    return next(
+      new AppError("No asset with this index was found on the subsection!", 404)
+    );
+  }
+
+  newAssets.map((asset) => {
+    if (asset.index >= index) {
+      newInd = asset.index - 1;
+      asset.index = newInd;
+    }
+  });
+
+  section.sub = newAssets;
+  section.sub.sort((a, b) => a.index - b.index);
+
+  await Section.findByIdAndUpdate(section.id, section);
+  const updatedCourse = await Course.findById(course.id);
+  return res.status(204).json({
+    status: "success",
+    message: "Section Text Successfully Added",
+    data: { course: updatedCourse },
+  });
+});
+
+// exports.getCheckoutSession = catchAsync(async (req, res, next) => {
+//   const course = req.course;
+//   const user = req.user;
+
+//   stripe.checkout.session.create({
+//     payment_method_types: ["card"],
+//     success_url: `${req.protocol}://${req.get("host")}/`,
+//     cancel_url: `${req.protocol}://${req.get("host")}/courses/${course.id}`,
+//     customer_email: user.email,
+//     client_reference_id: course.id,
+//     line_items: [
+//       {
+//         name: `${course.name} Course`,
+//         description: course.summary,
+//         images: [`${process.env.PROD_HOMEPAGE}/${course.image}`]
+//       }
+//     ]
+//   });
+// });
+
 // exports.rateCourse = catchAsync(async (req, res, next) => {
 //   const user = req.user;
 //   const { courseId } = req.params;
