@@ -184,6 +184,12 @@ exports.loginAsInstructor = catchAsync(async (req, res, next) => {
 
   let instructor = await Instructor.findOne({ email, verified: true });
 
+  if (!instructor) {
+    return next(
+      new AppError("No instructor found or please verify instructor email", 401)
+    );
+  }
+
   if (!instructor.password) {
     return next(
       new AppError("Please go to the update route to update password", 401)
@@ -217,6 +223,11 @@ exports.loginAsUser = catchAsync(async (req, res, next) => {
   }
 
   let user = await User.findOne({ email, verified: true });
+  if (!instructor) {
+    return next(
+      new AppError("No user found or please verify user email", 401)
+    );
+  }
 
   if (!user.password) {
     return next(
