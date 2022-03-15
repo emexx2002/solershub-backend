@@ -413,16 +413,6 @@ exports.addSubsectionText = catchAsync(async (req, res, next) => {
 
 exports.deleteOneAsset = catchAsync(async (req, res, next) => {
   const { sectionId } = req.params;
-  const index = req.body.index;
-
-  if (index == undefined) {
-    return next(
-      new AppError(
-        "Please provide the indexof the asset to be deleted in the request body",
-        400
-      )
-    );
-  }
 
   const section = await Section.findById(sectionId);
   if (!section) {
