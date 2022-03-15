@@ -165,7 +165,7 @@ exports.instructorSignUp = catchAsync(async (req, res, next) => {
 
   const emailSender = new Email(SENDGRID_API_KEY, newInstructor.email);
   const verifyToken = crypto.randomBytes(15).toString("hex");
-  await User.findByIdAndUpdate(newInstructor.id, { verifyHash: verifyToken });
+  await Instructor.findByIdAndUpdate(newInstructor.id, { verifyHash: verifyToken });
   await emailSender.sendWelcome(
     `${CONFIRM_URL}instructors/confirm/${newInstructor.id}/${verifyToken}`
   );
