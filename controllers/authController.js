@@ -102,7 +102,7 @@ exports.userSignUp = catchAsync(async (req, res, next) => {
     user.referredBy = referrer.id;
   }
 
-  user.password = await hashPassword(10, user.password);
+  user.password = await hashPassword(10, password);
   user.passwordChangeDate = Date.now();
 
   const newUser = await User.create(user);
