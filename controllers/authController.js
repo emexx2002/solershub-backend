@@ -55,13 +55,13 @@ const decodeJWT = async (token) => {
 };
 
 exports.userSignUp = catchAsync(async (req, res, next) => {
-  const { name, email, password, referredBy, birthday } = req.body;
+  const { name, email, password, referredBy, birthday, phone } = req.body;
   let referrer;
 
-  if (!name || !email || !password || !birthday) {
+  if (!name || !email || !password || !birthday || !phone) {
     return next(
       new AppError(
-        "Please pass name, email, password and birthday in request body",
+        "Please pass name, email, password, phone and birthday in request body",
         400
       )
     );
@@ -78,6 +78,7 @@ exports.userSignUp = catchAsync(async (req, res, next) => {
     password,
     birthday,
     paymentOptions,
+    phone
   };
 
   const users = await User.find();
@@ -127,12 +128,12 @@ exports.userSignUp = catchAsync(async (req, res, next) => {
 });
 
 exports.instructorSignUp = catchAsync(async (req, res, next) => {
-  const { name, email, password, description } = req.body;
+  const { name, email, password, description, phone } = req.body;
 
-  if (!name || !email || !password || !description) {
+  if (!name || !email || !password || !description || !phone) {
     return next(
       new AppError(
-        "Please pass name, email, password and description in request body"
+        "Please pass name, email, password, phone and description in request body"
       )
     );
   }
@@ -142,6 +143,7 @@ exports.instructorSignUp = catchAsync(async (req, res, next) => {
     email,
     description,
     password,
+    phone
   };
 
   const instructors = await Instructor.find();

@@ -37,6 +37,7 @@ const instructorSchema = new mongoose.Schema({
   verifyHash: String,
   passwordResetExpires: Date,
   passwordChangeDate: Date,
+  phone: String
 });
 
 const Instructor = mongoose.model("Instructor", instructorSchema);
