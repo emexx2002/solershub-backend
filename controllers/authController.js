@@ -157,7 +157,7 @@ exports.instructorSignUp = catchAsync(async (req, res, next) => {
     return next(new AppError("There is another user with this email", 400));
   }
 
-  instructor.password = await hashPassword(10, instructor.password);
+  instructor.password = await hashPassword(10, password);
   instructor.passwordChangeDate = Date.now();
 
   const newInstructor = await Instructor.create(instructor);
