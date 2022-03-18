@@ -3,12 +3,13 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const factoryController = require("./factoryController");
 const Section = require("../models/sectionModel");
+const Instructor = require("../models/instructorModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 let course, courses;
 
 exports.createCourse = catchAsync(async (req, res, next) => {
-  instructor = req.instructor;
+  const instructor = req.instructor;
   const { name, description, price, categories, summary } = req.body;
 
   if (!name || !description || !price || !categories) {
@@ -37,7 +38,10 @@ exports.createCourse = catchAsync(async (req, res, next) => {
     summary
   };
 
+  
   const newCourse = await Course.create(parameters);
+  instructor.courses = instructor.courses.push(newCourse.id)
+  await Instructor.findByIdAndUpdate(instructor.id, instructor)
 
   res.status(201).json({
     status: "success",

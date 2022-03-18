@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const emailVal = require("email-validator");
+const { Schema } = require("mongoose");
 
 const instructorSchema = new mongoose.Schema({
   name: {
@@ -22,11 +23,7 @@ const instructorSchema = new mongoose.Schema({
     type: String,
     required: [true, "Every user must have a password!"],
   },
-  courses: [
-    {
-      type: Object,
-    },
-  ],
+  courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
   image: {
     type: String,
   },
@@ -37,7 +34,12 @@ const instructorSchema = new mongoose.Schema({
   verifyHash: String,
   passwordResetExpires: Date,
   passwordChangeDate: Date,
-  phone: String
+  phone: String,
+});
+
+instructorSchema.pre(/^find/, function (next) {
+  this.populate("courses");
+  next();
 });
 
 const Instructor = mongoose.model("Instructor", instructorSchema);

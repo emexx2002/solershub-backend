@@ -23,7 +23,7 @@ exports.getAll = (Model, doc, course, name) =>
     const { limit, page } = req.query;
     const skip = (page - 1) * limit;
     if (course) {
-      doc = await Model.find({ published: true, status: "active" })
+      doc = await Model.find()
         .skip(skip)
         .limit(limit);
     } else {
