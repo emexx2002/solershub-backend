@@ -5,6 +5,7 @@ const factoryController = require("./factoryController");
 const Section = require("../models/sectionModel");
 const Instructor = require("../models/instructorModel");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const Review = require("../models/reviewModel");
 
 let course, courses;
 
@@ -12,7 +13,7 @@ exports.createCourse = catchAsync(async (req, res, next) => {
   const instructor = req.instructor;
   const { name, description, price, categories, summary } = req.body;
 
-  if (!name || !description || !price || !categories) {
+  if (!name || !description || !price || !categories || !summary) {
     return next(
       new AppError(
         "Please include name, description, categories and price!",
@@ -35,13 +36,12 @@ exports.createCourse = catchAsync(async (req, res, next) => {
     price,
     owner: instructor.id,
     categories: categoriesSplit,
-    summary
+    summary,
   };
 
-  
   const newCourse = await Course.create(parameters);
-  instructor.courses = instructor.courses.push(newCourse.id)
-  await Instructor.findByIdAndUpdate(instructor.id, instructor)
+  instructor.courses = instructor.courses.push(newCourse.id);
+  await Instructor.findByIdAndUpdate(instructor.id, instructor);
 
   res.status(201).json({
     status: "success",
@@ -104,14 +104,24 @@ exports.updateCourseBasic = catchAsync(async (req, res, next) => {
     );
   }
 
-  const categoriesArr = categories.split(",");
-  const parameters = {
-    name,
-    description,
-    price,
-    categories: categoriesArr,
-    status,
-  };
+  let parameters;
+  if (categories) {
+    const categoriesArr = categories.split(",");
+    parameters = {
+      name,
+      description,
+      price,
+      categories: categoriesArr,
+      status,
+    };
+  } else {
+    parameters = {
+      name,
+      description,
+      price,
+      status,
+    };
+  }
 
   console.log(parameters);
 

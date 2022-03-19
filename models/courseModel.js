@@ -48,7 +48,7 @@ const courseSchema = new mongoose.Schema({
     type: String,
     default: "inactive",
   },
-  phone: String
+  phone: String,
 });
 
 courseSchema.pre(/^find/, function (next) {
