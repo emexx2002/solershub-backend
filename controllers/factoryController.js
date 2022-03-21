@@ -22,11 +22,16 @@ exports.getAll = (Model, doc, course, name) =>
   catchAsync(async (req, res, next) => {
     const { limit, page } = req.query;
     const skip = (page - 1) * limit;
-    if (course) {
-      doc = await Model.find({ published: true, status: "active" })
-        .skip(skip)
-        .limit(limit);
-    } else {
+//     if (course) {
+//       doc = await Model.find({ published: true, status: "active" })
+//         .skip(skip)
+//         .limit(limit);
+//     }
+      if (course) {
+          doc = await Model.find()
+            .skip(skip)
+            .limit(limit);
+        } else {
       doc = await Model.find().skip(skip).limit(limit);
     }
     const count = await Model.count();
